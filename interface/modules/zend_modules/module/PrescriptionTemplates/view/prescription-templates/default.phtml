@@ -28,11 +28,122 @@
 <?php foreach ($prescriptions as $provider):?>
 <div class="page">
     <?php if(is_file($GLOBALS['fileroot'] . "/interface/pic/" . $GLOBALS['oer_config']['prescriptions']['logo_pic'])) ?>
+    <!--
     <div class="p-logo">
         <img width='68px' src=<?php echo $GLOBALS['rootdir'] . '/pic/' . $GLOBALS['oer_config']['prescriptions']['logo_pic']; ?> />
     </div>
+    -->
     <?php ?>
-    <h2><?php echo xlt('Medical prescription');?></h2>
+    <!--<h2><?php echo xlt('Medical prescription');?></h2>-->
+    <div dir="<?php echo text($langDir); ?>"  class="section" style="background: white;border:5px solid black;border-color:black!important;">
+        <span style="font-family:monotype;font-style:italic;text-align:center;font-size:20px;display:inherit"><?php echo xlt('Dr. Jorge O. Contreras Monchez');?></span>
+        <span style="text-align:center;font-size:13px;display:inherit">Especialista en Medicina Interna</span>
+        <table width="100%" style="font-size: 10px">
+            <tr >
+                <!--
+                <td colspan="2" width="60%"><span class="p-label"><?php echo xlt('Name') . ': ' ?></span><?php echo text($patient->get_name_display())?></td>-->
+                
+                
+            </tr>
+            <tr>
+                <td width="46%" style="font-size:8px">Medicentro La Esperanza Edifio "J", Local 216</br>27 Av. Nte. Entre 25 y 27 Calle Pte., San Salvador </br>(por las mañanas)</td>
+                <!--<td width="29%"><span class="p-label"></span></td>-->
+                <td width="33%"><span class="p-label">J.V.P.M. 4407</br>Tel 2264-0561</span></td>
+                <td width="33%" style="font-size:8px;direction:rtl">Calle Padres Aguilar #315</br>Colonia Escalon, San Salvador</br>(por las tardes)</td>
+            </tr>
+        </table>
+    </div>
+
+    <div>
+        <?php list($year,$month,$day) = explode("-",text(oeFormatShortDate())) ?>
+        <?php
+            if($month == "01"){
+                $month = "enero";
+            } elseif($month == "02") {
+                $month = "febrero";
+            } elseif($month == "03") {
+                $month = "marzo";
+            } elseif($month == "04") {
+                $month = "abril";
+            } elseif($month == "05") {
+                $month = "mayo";
+            } elseif($month == "06") {
+                $month = "junio";
+            } elseif($month == "07") {
+                $month = "julio";
+            } elseif($month == "08") {
+                $month = "agosto";
+            } elseif($month == "09") {
+                $month = "septiembre";
+            } elseif($month == "10") {
+                $month = "octubre";
+            } elseif($month == "11") {
+                $month = "noviembre";
+            } elseif($month == "12") {
+                $month = "diciembre";
+            }
+        ?>
+        <p style="font-style:italic;direction:rtl;font-size:16px">San Salvador, <?php echo text($day) ?> de <?php echo text($month) ?> del año <?php echo text($year) ?></p>
+        <p>Paciente: <b><span style="text-decoration:underline"><?php echo text($patient->get_name_display())?></b></span></p>
+        <ol>
+            <?php $hasRec = false ?>
+            <?php $recPos = -1 ?>
+            <?php $hasProxCita = false ?>
+            <?php $proxCitaPos = -1 ?>
+            <?php $curPos = 0 ?>
+            <?php foreach ($provider as $k => $p):?>
+                <?php if($p->get_drug() == "Recomendaciones"): ?>
+                    <?php $hasRec = true ?>
+                    <?php $recPos = $k ?> 
+                    <?php continue; ?>
+                <?php endif;?> 
+                <?php if($p->get_drug() == "Cita"): ?>
+                    <?php $hasProxCita = true ?>
+                    <?php $proxCitaPos = $k ?>
+                    <?php continue; ?>
+                <?php endif;?>
+                <li><?php echo text($p->get_drug())?>
+                    </br><?php echo text($p->get_dosage()) . ' ' . text($p->form_array[$p->get_form()]) . ' ' . text($p->route_array[$p->get_route()]) . ' ' . text($p->interval_array[$p->get_interval()])?>
+                    </br><span style="padding-left:350px">#<?php echo text($p->get_note())?></span>
+
+                </li>
+                <?php $curPos++ ?>
+
+            <?php endforeach; ?>
+            <?php if ($hasRec): ?>
+                <li><?php echo text($provider[$recPos]->get_drug()) ?>
+                    <?php $pieces = explode(".", $provider[$recPos]->get_note())?>
+                    <ol start="a">
+                    <?php foreach ($pieces as $k => $p):?> 
+                        <?php if($k != count($pieces)-1):?>
+                            <li><?php echo text($p)?> 
+                        <?php endif;?> 
+                    <?php endforeach; ?>
+                    </ol>
+
+                </li>
+
+            <?php endif;?>
+        </ol>
+    </div>
+
+    <div style="padding-top:100px">
+        <p style="direction:rtl;text-decoration:underline;padding-right:100px">______________________________________</p>
+        <p style="direction:rtl;font-family:monotype;font-style:italic;font-size:20px;padding-right:100px">Dr. Jorge O. Contreras Mónchez</p>
+        <p style="direction:rtl;font-family:monotype;font-size:14px;padding-right:100px;line-height:0">ESPECIALISTA EN MEDICINA INTERNA</p>
+        <p style="direction:rtl;font-family:monotype;font-size:18px;padding-right:175px"><b>J.V.P.M. 4407</b>
+        </br></br>
+        </p>
+
+
+        <p>Próxima cita ________________________</p>
+        <?php if($hasProxCita): ?>
+            <p style="padding-left: 110px"><?php echo text($provider[$proxCitaPos]->get_note()) ?></p>
+        <?php endif;?>
+        
+    </div>
+
+<!--
     <div dir="<?php echo text($langDir); ?>"  class="section">
         <span class="title"><?php echo xlt('Patient details');?></span>
         <table width="100%" style="font-size: 15px">
@@ -57,7 +168,7 @@
             </tr>
             <tr>
                 <td width="40%"><span class="p-label"><?php echo xlt('Directions') . ': ' ?></span><?php echo text($p->get_dosage()) . ' ' . text($p->form_array[$p->get_form()]) . ' ' . text($p->route_array[$p->get_route()]) . ' ' . text($p->interval_array[$p->get_interval()])?></td>
-                <td colspan="2" width="60%"><span class="p-label"><?php echo xlt('Notes') . ': ' ?></span><?php echo text($p->get_note())?></td>
+                <td colspan="2" width="60%"><span class="p-label"><?php echo xlt('Notes') . ': ' ?></span>`</td>
             </tr>
             <?php if($k+1 !== count($provider)): ?>
             <tr>
@@ -83,8 +194,9 @@
         </table>
     </div>
 </div>
+-->
 <?php endforeach; ?>
 <script>
-    window.print();
-    window.close();
+    //window.print();
+    //window.close();
 </script>

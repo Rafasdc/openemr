@@ -62,22 +62,49 @@ class RxList
 
     function getPage($query)
     {
-        $url = "https://rxnav.nlm.nih.gov/REST/Prescribe/drugs";
-        $response = oeHttp::get($url, ['name'=>$query]);
-        $buffer = $response->body();
-        return $buffer ? $buffer : false;
+        //$url = "https://rxnav.nlm.nih.gov/REST/Prescribe/drugs?name=".urlencode($query);
+        $url = "http://apiconsulta.medicamentos.gob.sv/public/productos?page=1&page-max=25&q=".urlencode($query);
+            if (!($fp = fopen($url, "r"))) {
+                // If we fail to get the page, return false
+                return false;
+            } else {
+                // Get the page
+                
+                while (!feof($fp)) {
+                    $buffer .= fgets($fp, 4096);
+                }
+                fclose($fp);
+                return $buffer;
+            }
+
     } // end function RxList::getPage
+
 
     function get_list($query)
     {
         $page = RxList::getPage($query);
-        $tokens = RxList::parse2tokens($page);
-        $hash = RxList::tokens2hash($tokens);
+        //$tokens = RxList::parse2tokens($page);
+        //$hash = RxList::tokens2hash($tokens);
+        $json = json_decode($page);
+        //$data = $json->data[0]->nombreComercial;
+        $data = $json->data;
+        //var_dump($json);
+        //echo("<script>console.log('PHP: ".$data."');</script>");
+        //foreach ($json->)
+        foreach ($json->data as $index){
+            //echo("<script>console.log('PHP: ".$index->formula."');</script>");
+            $list[$index->nombreComercial] = $index->nombreComercial.' ('.$index->formula.')';
+            //$list[$index->formula] = ;
+        }
+        return $list;
+
+        /*
         foreach ($hash as $index => $data) {
             unset($my_data);
             foreach ($data as $k => $v) {
                 $my_data[$k] = $v;
             }
+
 
             $rxcui = '';
 
@@ -93,8 +120,8 @@ class RxList
             $list[trim($my_data['name']).$synonym] =
                 trim($my_data['name']);
         }
-
         return $list;
+        */
     } // end function RxList::get_list
 
     /* break the web page into a collection of TAGS

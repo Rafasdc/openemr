@@ -52,7 +52,7 @@ class PdfTemplatesController extends PrescriptionTemplatesController
     public function defaultAction()
     {
         $id = $this->params()->fromQuery('id');
-        $defaultHtml = $this->getDefaultTemplate($id);
+        $defaultHtml = $this->getPDFTemplate($id);
 
         $htmlView = $this->renderer->render($defaultHtml);
 

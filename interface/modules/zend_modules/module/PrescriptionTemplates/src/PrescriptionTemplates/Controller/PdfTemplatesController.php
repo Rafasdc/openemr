@@ -36,12 +36,14 @@ use Zend\View\Renderer\PhpRenderer;
  */
 class PdfTemplatesController extends PrescriptionTemplatesController
 {
+
     private $renderer;
 
     public function __construct(ContainerInterface $container)
     {
-        parent::__construct($container);
+        //parent::__construct($container);
         $this->renderer = $container->get(\Zend\View\Renderer\PhpRenderer::class);
+        
     }
 
     /**

@@ -296,10 +296,19 @@ function cancelParlookup () {
 
 $(function() {
 
+    $(document).ready(function(){
+      //$("#oefooter").preppend('<a>Test</a>');
+      //var save = $("#save");
+      $(parent.document).find('#oefooter').prepend('<a id="save" href="#" onclick="document.getElementById(\'modalframe\').contentWindow.submitfun();" class="css_button_small"><span>Save</span></a>');
+      //$(parent.document).find('#oefooter').prepend(save);
+    });
+    //$("#oefooter").append('<a>Test</a>');
+
     $("#save,#back").on("click",function(){
         $("#clearButton",window.parent.document).css("display", "none");
         $("#backButton",window.parent.document).css("display", "none");
         $("#addButton",window.parent.document).css("display", "");
+        $(parent.document).find('#save').remove();
     });
 
     {/literal}

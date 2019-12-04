@@ -390,7 +390,7 @@ $(function() {
     });
 
     {/literal}
-    var arr = {$prescription->search_recommendation('recommendations','reco')|@json_encode};
+    var arr = {$prescription->search_recommendation('recommendations')|@json_encode};
     {literal}
     console.log(arr);
     //console.log(arr);

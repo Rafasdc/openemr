@@ -273,12 +273,14 @@ class Prescription extends ORDataObject
         return $arr;
     }
 
-    function search_recommendation($q,$s)
+    function search_recommendation($q)
     {
-        $statemet = "SELECT * FROM list_options WHERE list_id = 'recommendations' AND activity = 1";
+        $statement = "SELECT * FROM list_options WHERE list_id = 'recommendations' AND title LIKE 'reco%' AND activity = 1";
+        //echo($statement);
         $res = sqlStatement($statement);
-        error_log(res);
+        //error_log($res);
         while ($row = sqlFetchArray($res)) {
+            //error_log($row);
             if ($row['title'] == '') {
                 $arr[$row['option_id']] = ' ';
             } else {

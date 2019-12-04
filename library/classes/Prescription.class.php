@@ -121,6 +121,7 @@ class Prescription extends ORDataObject
     var $filled_date;
     var $provider;
     var $note;
+    var $recomendations;
     var $drug;
     var $rxnorm_drugcode;
     var $form;
@@ -137,7 +138,10 @@ class Prescription extends ORDataObject
 
     var $drug_id;
     var $active;
+    var $recommendation;
     var $ntx;
+
+    var $recomm;
 
     /**
     * Constructor sets all Prescription attributes to their default value
@@ -149,6 +153,7 @@ class Prescription extends ORDataObject
         $this->form_array = $this->load_drug_attributes('drug_form');
         $this->interval_array = $this->load_drug_attributes('drug_interval');
         $this->unit_array = $this->load_drug_attributes('drug_units');
+        //$this->recomm = $this->search_recommendation('recommendations');
 
         $this->substitute_array = array("",xl("substitution allowed"),
             xl("do not substitute"));
@@ -179,9 +184,11 @@ class Prescription extends ORDataObject
             $this->date_modified = date("Y-m-d");
             $this->per_refill = 0;
             $this->note = "";
+            $this->recomendations="";
 
             $this->drug_id = 0;
             $this->active = 1;
+            $this->recommendation = 0;
 
         $this->ntx = 0;
 
@@ -227,6 +234,7 @@ class Prescription extends ORDataObject
             ."Provider: " . $this->provider. "\n"
             ."Provider ID: " . $this->provider->id. "\n"
             ."Note: " . $this->note. "\n"
+            ."Recomendations: " . $this->recomendations. "\n"
             ."Drug: " . $this->drug. "\n"
           ."Code: " . $this->rxnorm_drugcode. "\n"
             ."Form: " . $this->form_array[$this->form]. "\n"
@@ -241,6 +249,7 @@ class Prescription extends ORDataObject
             ."Per Refill: " . $this->per_refill . "\n"
             ."Drug ID: " . $this->drug_id . "\n"
             ."Active: " . $this->active . "\n"
+            ."recommendation: ".$this->recommendation . "\n"
             ."Transmitted: " . $this->ntx;
 
         if ($html) {
@@ -262,6 +271,23 @@ class Prescription extends ORDataObject
         }
 
         return $arr;
+    }
+
+    function search_recommendation($q)
+    {
+        
+        $res = sqlStatement("SELECT * FROM list_options WHERE list_id = ? AND activity = 1",array($q));
+        
+        while ($row = sqlFetchArray($res)) {
+            if ($row['title'] == '') {
+                $arr[$row['option_id']] = ' ';
+            } else {
+                $arr[$row['option_id']] = xl_list_label($row['title']);
+            }
+        }
+        
+        return $arr;
+        
     }
 
     function get_encounter()
@@ -591,6 +617,19 @@ class Prescription extends ORDataObject
         return $this->note;
     }
 
+    
+    function set_recomendations($recomendations)
+    {
+        $this->recomendations = $recomendations;
+    }
+    
+    function get_recomendations()
+    {
+        return $this->recomendations;
+    }
+    
+    
+
     function set_drug($drug)
     {
         if ($GLOBALS['weno_rx_enable']) {
@@ -668,6 +707,15 @@ class Prescription extends ORDataObject
         return $this->active;
     }
 
+    
+    function get_recommendation(){
+        return $this->recommendation;
+    }
+
+    function set_recommendation($recommendation){
+        $this->recommendation = $recommendation;
+    }
+    
     function get_prescription_display()
     {
         $pconfig = $GLOBALS['oer_config']['prescriptions'];

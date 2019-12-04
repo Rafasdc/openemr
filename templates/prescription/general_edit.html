@@ -96,7 +96,11 @@ select{
  }
 
 </script>
+
+<script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
+
 {/literal}
+
 </head>
 <body id="prescription_edit" class="body_top">
 
@@ -158,6 +162,12 @@ select{
   </td>
 </tr>
 <tr>
+    <td COLSPAN="1" class="text input-sm" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Recommendation'}</td>
+    <td COLSPAN="2" ALIGN="LEFT" VALIGN="MIDDLE" >
+      <input class="input-sm"type="checkbox" name="recommendation" value="1"{if $prescription->get_recommendation() > 0} checked{/if} />
+    </td>
+  </tr>
+<tr>
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Starting Date'}</td>
   <td COLSPAN="2" ALIGN="LEFT" VALIGN="MIDDLE" >
       <input   type="text" size="10" class="datepicker" name="start_date" id="start_date" value="{$prescription->start_date|oeFormatShortDate|attr}" />
@@ -191,7 +201,7 @@ select{
   </td>
 </tr>
 {/if}
-<tr>
+<tr id="quantity_row">
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Quantity'}</td>
   <td COLSPAN="2" ALIGN="LEFT" VALIGN="MIDDLE" >
     <input class="input-sm" TYPE="TEXT" NAME="quantity" id="quantity" SIZE="10" MAXLENGTH="31"
@@ -202,7 +212,7 @@ select{
 {if $SIMPLIFIED_PRESCRIPTIONS && !$prescription->size}
 <tr style='display:none;'>
 {else}
-<tr>
+<tr style="display:none;">
 {/if}
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Medicine Units'}</td>
   <td COLSPAN="2" ALIGN="LEFT" VALIGN="MIDDLE" >
@@ -210,7 +220,7 @@ select{
     <select class="input-sm" name="unit" id="unit">{html_options options=$prescription->unit_array selected=$prescription->unit}</select>
   </td>
 </tr>
-<tr>
+<tr id="directions_row">
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Directions'}</td>
   <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
 {if $SIMPLIFIED_PRESCRIPTIONS && !$prescription->form && !$prescription->route && !$prescription->interval}
@@ -226,6 +236,7 @@ select{
 {/if}
   </td>
 </tr>
+<!--
 <tr>
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Refills'}</td>
   <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
@@ -238,13 +249,27 @@ select{
 {/if}
   </td>
 </tr>
-<tr>
+-->
+<tr id="patient_notes">
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Notes'}</td>
   <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
   <textarea class="form-control" name="note" cols="30" rows="1" wrap="virtual">{$prescription->note|text}</textarea>
   </td>
 </tr>
+<tr id="recommendation_holder" style="display: none;">
+  <td>
+      <div id="recommendation_list" class="list-group col"></div>
+  </td>
+</tr>
+<!--
 <tr>
+    <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Recomendations'}</td>
+    <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
+    <textarea class="form-control" name="recomendations" cols="30" rows="1" wrap="virtual">{$prescription->recomendations|text}</textarea>
+    </td>
+  </tr>
+<tr>
+-->
 {if $WEIGHT_LOSS_CLINIC}
   <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Substitution'}</td>
   <td COLSPAN="2" ALIGN="LEFT" VALIGN="MIDDLE" >
@@ -294,24 +319,110 @@ function cancelParlookup () {
     $("#hiddendiv").html( "&nbsp;" );
 }
 
+function recommendationChecked (){
+  $('input[name="drug"]').val("Recomendaciones");
+  //$('input[name="drug"]').prop('disabled',true);
+  $('input[name="quantity"]').val("1");
+  $('input[name="dosage"]').val("1");
+  $('#quantity_row').hide();
+  $('#directions_row').hide();
+  $('#patient_notes').hide();
+  $('#recommendation_holder').show();
+}
+
+function recommendationUnchecked (){
+  $('input[name="drug"]').val("");
+  $('input[name="drug"]').prop('disabled',false);
+  $('input[name="quantity"]').val("");
+  $('input[name="dosage"]').val("");
+  $('#quantity_row').show();
+  $('#directions_row').show();
+  $('#patient_notes').show();
+  $('#recommendation_holder').hide();
+}
+
 $(function() {
 
     $(document).ready(function(){
       //$("#oefooter").preppend('<a>Test</a>');
       //var save = $("#save");
       $(parent.document).find('#oefooter').prepend('<a id="save" href="#" onclick="document.getElementById(\'modalframe\').contentWindow.submitfun();" class="css_button_small"><span>Save</span></a>');
+      $(parent.document).find('#oefooter #save').on("click",function(){
+        $("#clearButton",window.parent.document).css("display", "none");
+        $("#backButton",window.parent.document).css("display", "none");
+        $("#addButton",window.parent.document).css("display", "");
+        console.log($(parent.document).find('#oefooter #save'));
+        $(parent.document).find('#oefooter #save').remove();
+    });
       //$(parent.document).find('#oefooter').prepend(save);
+      var recommendation = $('input[name="recommendation"]');
+      if (recommendation[0].checked){
+        recommendationChecked();
+      }
+      recommendation.change(function(){
+        var checked = $(this)[0].checked;    
+        if(checked){
+          recommendationChecked();
+        } else {
+          recommendationUnchecked();
+        }
+        
+      });
+      /*
+      $('input[name="recommendation"]').on("clicked",function(){
+        console.log("clicked");
+      });
+      */
+      console.log($(parent.document).find('#oefooter #save'));
+
+
     });
     //$("#oefooter").append('<a>Test</a>');
+
 
     $("#save,#back").on("click",function(){
         $("#clearButton",window.parent.document).css("display", "none");
         $("#backButton",window.parent.document).css("display", "none");
         $("#addButton",window.parent.document).css("display", "");
         $(parent.document).find('#save').remove();
+        
+        //$(parent.document).find('#oefooter').find("save").each.remove();
     });
 
     {/literal}
+    var arr = {$prescription->search_recommendation('recommendations')|@json_encode};
+    {literal}
+    console.log(arr);
+    //console.log(arr);
+
+    var currNotes = $("textarea[name='note']").val();
+      if (currNotes !== "") {
+          var tmpArr = currNotes.split(';');
+          tmpArr.forEach(function(element){
+            if (element !== ""){
+              arrTest.push(element);
+            }
+            console.log(arrTest);
+          });
+    }
+
+    var sortList = new Sortable(recommendation_list, {
+      animation: 150,
+      ghostClass: 'blue-background-class',
+      onEnd: function(evt){
+        console.log(evt.oldIndex);
+        console.log(evt.newIndex);
+        //array_move(arrTest,evt.oldIndex,evt.newIndex);
+        //showArray();
+        //console.log(evt.item);
+      }
+    });
+
+
+
+
+    {/literal}
+    
     {if $GLOBALS.weno_rx_enable}
         {literal}
         $('#drug').autocomplete({

@@ -256,11 +256,23 @@ select{
   <textarea class="form-control" name="note" cols="30" rows="1" wrap="virtual">{$prescription->note|text}</textarea>
   </td>
 </tr>
-<tr id="recommendation_holder" style="display: none;">
-  <td>
-      <div id="recommendation_list" class="list-group col"></div>
+<tr id="rec_search_holder" style="display:none;">
+  <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Search'}</td>
+  <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
+    <input class="input-sm" type="text" size=50 name="recommendations" id="rec_search"/><a type="button" id="add_reco" class="btn btn-success">{xlt t='Add'}</a>
   </td>
 </tr>
+<tr id="recommendation_holder" style="display: none;">
+  <td COLSPAN="2" class="text" ALIGN="CENTER" VALIGN="MIDDLE">
+      <ul id="recommendation_list" class="list-group col"></ul>
+  </td>
+</tr>
+<tr id="rec_helper_editor" style="display:none;">
+    <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Search'}</td>
+    <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
+      <input class="input-sm" type="text" size=50 name="recommendations" id="rec_search"/><a type="button" id="save_edit_reco" class="btn btn-success">{xlt t='Save'}</a><a type="button" id="cancel_edit_reco" class="btn btn-danger">{xlt t='Cancel'}</a>
+    </td>
+  </tr>
 <!--
 <tr>
     <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Recomendations'}</td>
@@ -326,8 +338,9 @@ function recommendationChecked (){
   $('input[name="dosage"]').val("1");
   $('#quantity_row').hide();
   $('#directions_row').hide();
-  $('#patient_notes').hide();
+  //$('#patient_notes').hide();
   $('#recommendation_holder').show();
+  $('#rec_search_holder').show();
 }
 
 function recommendationUnchecked (){
@@ -339,6 +352,7 @@ function recommendationUnchecked (){
   $('#directions_row').show();
   $('#patient_notes').show();
   $('#recommendation_holder').hide();
+  $('#rec_search_holder').hide();
 }
 
 $(function() {
@@ -355,7 +369,7 @@ $(function() {
         $(parent.document).find('#oefooter #save').remove();
     });
       //$(parent.document).find('#oefooter').prepend(save);
-      var recommendation = $('input[name="recommendation"]');
+      var recommendation = $('input[name="recommendation"]');    
       if (recommendation[0].checked){
         recommendationChecked();
       }
@@ -373,12 +387,14 @@ $(function() {
         console.log("clicked");
       });
       */
-      console.log($(parent.document).find('#oefooter #save'));
+      //console.log($(parent.document).find('#oefooter #save'));
 
 
     });
     //$("#oefooter").append('<a>Test</a>');
-
+    $("#backButton").on("click",function(){
+      $(parent.document).find('#oefooter #save').remove();
+    })
 
     $("#save,#back").on("click",function(){
         $("#clearButton",window.parent.document).css("display", "none");
@@ -390,10 +406,57 @@ $(function() {
     });
 
     {/literal}
-    var arr = {$prescription->search_recommendation('recommendations')|@json_encode};
+    //var arr = {$prescription->search_recommendation('recommendations','reco')|@json_encode};
     {literal}
-    console.log(arr);
     //console.log(arr);
+
+    $('#rec_search').autocomplete({
+      {/literal}
+      source: 'library/ajax/recommendations.php?csrf_token_form=' + {$CSRF_TOKEN_FORM|js_url},
+      minLength: 2,
+      {literal}
+    });    
+    //console.log(arr);
+
+    $("#add_reco").click(function(){
+      var r = $("#rec_search").val();
+      $("textarea[name='note']").append(r + ";");
+      updateRecList();
+      $("#rec_search").val("");
+    });
+
+    function editRec(){
+      console.log($("#edit_rec"));
+    }
+
+    function removeRec(){
+      console.log(this);
+    }
+
+    $("#recommendation_list").on("click","#edit_rec",function(){
+      editRec();
+    });
+
+    var arrTest = [];
+
+    function updateRecList(){
+      arrTest = [];
+      $("#recommendation_list").empty();
+      var currNotes = $("textarea[name='note']").val();
+      if (currNotes !== "") {
+          var tmpArr = currNotes.split(';');
+          tmpArr.forEach(function(element){
+            if (element !== ""){
+              arrTest.push(element);
+            }
+          console.log(arrTest);
+          });
+      }
+
+      arrTest.forEach(function(element){
+        $("#recommendation_list").append('<li class="list-group-item" style="min-width: 500px">' + element + '<span id="edit_rec" class="badge glyphicon glyphicon-pencil" aria-hidden="true" style="display:initial !important;"></span><span onclick="removeRec()" class="badge glyphicon glyphicon-remove" aria-hidden="true" style="display:initial !important;"></span></li>');
+      });
+    }
 
     var currNotes = $("textarea[name='note']").val();
       if (currNotes !== "") {
@@ -412,13 +475,39 @@ $(function() {
       onEnd: function(evt){
         console.log(evt.oldIndex);
         console.log(evt.newIndex);
-        //array_move(arrTest,evt.oldIndex,evt.newIndex);
-        //showArray();
+        array_move(arrTest,evt.oldIndex,evt.newIndex);
+        showArray();
         //console.log(evt.item);
       }
     });
 
+    function showArray(){
+      console.log(arrTest);
+      var notes = $("textarea[name='note']");
+      notes.val("");
+      arrTest.forEach(function(element, index){
+        notes.val(notes.val()  + element + ";");
+        /*
+        if (index != arrTest.length -1 ){
+          notes.val(notes.val()  + element + ";");
+        } else {
+          notes.val(notes.val()  + element);
+        } 
+        */
+      }); 
+    }
 
+    function array_move(arr, old_index, new_index) {
+        console.log(typeof old_index);
+        if (new_index >= arr.length) {
+            var k = new_index - arr.length + 1;
+            while (k--) {
+                arr.push(undefined);
+            }
+        }
+        arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+        return arr; // for testing
+    }
 
 
     {/literal}

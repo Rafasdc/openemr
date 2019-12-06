@@ -262,17 +262,18 @@ select{
     <input class="input-sm" type="text" size=50 name="recommendations" id="rec_search"/><a type="button" id="add_reco" class="btn btn-success">{xlt t='Add'}</a>
   </td>
 </tr>
+<tr id="rec_helper_editor" style="display:none;">
+  <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Edit'}</td>
+  <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
+    <input class="input-sm" type="text" size=50 name="recommendation_edit" id="rec_edit"/><a type="button" id="save_edit_reco" class="btn btn-success">{xlt t='Save'}</a><a type="button" id="cancel_edit_reco" class="btn btn-danger">{xlt t='Cancel'}</a>
+  </td>
+</tr>
 <tr id="recommendation_holder" style="display: none;">
+  <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='List'}</td>
   <td COLSPAN="2" class="text" ALIGN="CENTER" VALIGN="MIDDLE">
       <ul id="recommendation_list" class="list-group col"></ul>
   </td>
 </tr>
-<tr id="rec_helper_editor" style="display:none;">
-    <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Search'}</td>
-    <td COLSPAN="2" class="text" ALIGN="LEFT" VALIGN="MIDDLE" >
-      <input class="input-sm" type="text" size=50 name="recommendations" id="rec_search"/><a type="button" id="save_edit_reco" class="btn btn-success">{xlt t='Save'}</a><a type="button" id="cancel_edit_reco" class="btn btn-danger">{xlt t='Cancel'}</a>
-    </td>
-  </tr>
 <!--
 <tr>
     <td COLSPAN="1" class="text" ALIGN="right" VALIGN="MIDDLE" >{xlt t='Recomendations'}</td>
@@ -425,8 +426,12 @@ $(function() {
       $("#rec_search").val("");
     });
 
-    function editRec(){
-      console.log($("#edit_rec"));
+    function editRec(clicked){
+      console.log(clicked);
+      //console.log($(this));
+      var rec_to_edit = $(clicked).parent().text();
+      $("#rec_edit").val(rec_to_edit);
+      $("#rec_helper_editor").show();
     }
 
     function removeRec(){
@@ -434,7 +439,7 @@ $(function() {
     }
 
     $("#recommendation_list").on("click","#edit_rec",function(){
-      editRec();
+      editRec(this);
     });
 
     var arrTest = [];
@@ -454,7 +459,7 @@ $(function() {
       }
 
       arrTest.forEach(function(element){
-        $("#recommendation_list").append('<li class="list-group-item" style="min-width: 500px">' + element + '<span id="edit_rec" class="badge glyphicon glyphicon-pencil" aria-hidden="true" style="display:initial !important;"></span><span onclick="removeRec()" class="badge glyphicon glyphicon-remove" aria-hidden="true" style="display:initial !important;"></span></li>');
+        $("#recommendation_list").append('<li class="list-group-item" style="min-width: 350px">' + element + '<span id="edit_rec" class="badge glyphicon glyphicon-pencil" aria-hidden="true" style="display:initial !important;"></span><span onclick="removeRec()" class="badge glyphicon glyphicon-remove" aria-hidden="true" style="display:initial !important;"></span></li>');
       });
     }
 

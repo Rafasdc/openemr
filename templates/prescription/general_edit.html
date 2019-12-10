@@ -358,6 +358,30 @@ function recommendationUnchecked (){
 
 $(function() {
 
+  var arrTest = [];
+  var currEdit;
+  var editSpan = '<span id="edit_rec" class="badge glyphicon glyphicon-pencil" aria-hidden="true" style="display:initial !important;"></span>';
+  var remSpan  = '<span id="remove_rec" class="badge glyphicon glyphicon-remove" aria-hidden="true" style="display:initial !important;"></span>';
+
+  function updateRecList(){
+      arrTest = [];
+      $("#recommendation_list").empty();
+      var currNotes = $("textarea[name='note']").val();
+      if (currNotes !== "") {
+          var tmpArr = currNotes.split(';');
+          tmpArr.forEach(function(element){
+            if (element !== ""){
+              arrTest.push(element);
+            }
+          //console.log(arrTest);
+          });
+      }
+
+      arrTest.forEach(function(element){
+        $("#recommendation_list").append('<li class="list-group-item" style="min-width: 350px">' + element + editSpan + remSpan + '</li>');
+      });
+    }
+
     $(document).ready(function(){
       //$("#oefooter").preppend('<a>Test</a>');
       //var save = $("#save");
@@ -373,6 +397,7 @@ $(function() {
       var recommendation = $('input[name="recommendation"]');    
       if (recommendation[0].checked){
         recommendationChecked();
+        updateRecList();
       }
       recommendation.change(function(){
         var checked = $(this)[0].checked;    
@@ -390,10 +415,10 @@ $(function() {
       */
       //console.log($(parent.document).find('#oefooter #save'));
 
-
     });
+    $(parent.document).find("#addButton").hide();
     //$("#oefooter").append('<a>Test</a>');
-    $("#backButton").on("click",function(){
+    $(parent.document).find("#backButton").on("click",function(){
       $(parent.document).find('#oefooter #save').remove();
     })
 
@@ -427,41 +452,50 @@ $(function() {
     });
 
     function editRec(clicked){
-      console.log(clicked);
+      currEdit = $(clicked).parent().index();
       //console.log($(this));
       var rec_to_edit = $(clicked).parent().text();
       $("#rec_edit").val(rec_to_edit);
       $("#rec_helper_editor").show();
     }
 
-    function removeRec(){
-      console.log(this);
+    function removeRec(clicked){
+      console.log($(clicked));
+      arrTest.splice($(clicked).parent().index(),1);
+      $(clicked).parent().remove();
+      showArray();
+
     }
 
     $("#recommendation_list").on("click","#edit_rec",function(){
       editRec(this);
     });
 
-    var arrTest = [];
+    $("#recommendation_list").on("click","#remove_rec",function(){
+      var r = confirm("Delete Recommendation?")
+      if (r){removeRec(this);}
+    });
 
-    function updateRecList(){
-      arrTest = [];
-      $("#recommendation_list").empty();
-      var currNotes = $("textarea[name='note']").val();
-      if (currNotes !== "") {
-          var tmpArr = currNotes.split(';');
-          tmpArr.forEach(function(element){
-            if (element !== ""){
-              arrTest.push(element);
-            }
-          console.log(arrTest);
-          });
+    $("#save_edit_reco").on("click",function(){
+      if (currEdit != undefined){
+        arrTest[currEdit] =  $("#rec_edit").val();
+        console.log(currEdit);
+        var iToEdit = $("#recommendation_list").children()[currEdit];        
+        $(iToEdit).html($("#rec_edit").val() + editSpan + remSpan);
+        showArray();
       }
+      $("#rec_edit").val("");
+      $("#rec_helper_editor").hide();
+    });
 
-      arrTest.forEach(function(element){
-        $("#recommendation_list").append('<li class="list-group-item" style="min-width: 350px">' + element + '<span id="edit_rec" class="badge glyphicon glyphicon-pencil" aria-hidden="true" style="display:initial !important;"></span><span onclick="removeRec()" class="badge glyphicon glyphicon-remove" aria-hidden="true" style="display:initial !important;"></span></li>');
-      });
-    }
+    $("#cancel_edit_reco").on("click",function(){
+      $("#rec_edit").val("");
+      $("#rec_helper_editor").hide();
+    });   
+
+    
+
+    /*
 
     var currNotes = $("textarea[name='note']").val();
       if (currNotes !== "") {
@@ -473,13 +507,14 @@ $(function() {
             console.log(arrTest);
           });
     }
+    */
 
     var sortList = new Sortable(recommendation_list, {
       animation: 150,
       ghostClass: 'blue-background-class',
       onEnd: function(evt){
-        console.log(evt.oldIndex);
-        console.log(evt.newIndex);
+        //console.log(evt.oldIndex);
+        //console.log(evt.newIndex);
         array_move(arrTest,evt.oldIndex,evt.newIndex);
         showArray();
         //console.log(evt.item);
@@ -487,7 +522,7 @@ $(function() {
     });
 
     function showArray(){
-      console.log(arrTest);
+      //console.log(arrTest);
       var notes = $("textarea[name='note']");
       notes.val("");
       arrTest.forEach(function(element, index){
@@ -503,7 +538,7 @@ $(function() {
     }
 
     function array_move(arr, old_index, new_index) {
-        console.log(typeof old_index);
+        //console.log(typeof old_index);
         if (new_index >= arr.length) {
             var k = new_index - arr.length + 1;
             while (k--) {

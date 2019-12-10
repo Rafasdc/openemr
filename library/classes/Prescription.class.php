@@ -153,7 +153,6 @@ class Prescription extends ORDataObject
         $this->form_array = $this->load_drug_attributes('drug_form');
         $this->interval_array = $this->load_drug_attributes('drug_interval');
         $this->unit_array = $this->load_drug_attributes('drug_units');
-        //$this->recomm = $this->search_recommendation('recommendations');
 
         $this->substitute_array = array("",xl("substitution allowed"),
             xl("do not substitute"));
@@ -249,7 +248,7 @@ class Prescription extends ORDataObject
             ."Per Refill: " . $this->per_refill . "\n"
             ."Drug ID: " . $this->drug_id . "\n"
             ."Active: " . $this->active . "\n"
-            ."recommendation: ".$this->recommendation . "\n"
+            ."Recommendation: ".$this->recommendation . "\n"
             ."Transmitted: " . $this->ntx;
 
         if ($html) {

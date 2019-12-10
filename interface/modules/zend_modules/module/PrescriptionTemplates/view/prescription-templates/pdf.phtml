@@ -89,9 +89,18 @@
             <?php $proxCitaPos = -1 ?>
             <?php $curPos = 0 ?>
             <?php foreach ($provider as $k => $p):?>
-                <?php if($p->get_drug() == "Recomendaciones"): ?>
-                    <?php $hasRec = true ?>
-                    <?php $recPos = $k ?> 
+                <?php if($p->get_recommendation()): ?>
+                    <li><?php echo text($p->get_drug()) ?>
+                    <?php $pieces = explode(";", $p->get_note())?>
+                        <ol type="a">
+                        <?php foreach ($pieces as $k => $r):?> 
+                            <?php if($k != count($pieces)-1):?>
+                                <li><?php echo text($r)?> 
+                            <?php endif;?> 
+                        <?php endforeach; ?>
+                        </ol>
+                    </li>
+                    <br>
                     <?php continue; ?>
                 <?php endif;?> 
                 <?php if($p->get_drug() == "Cita"): ?>

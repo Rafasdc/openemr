@@ -90,9 +90,17 @@
             <?php $proxCitaPos = -1 ?>
             <?php $curPos = 0 ?>
             <?php foreach ($provider as $k => $p):?>
-                <?php if($p->get_drug() == "Recomendaciones"): ?>
-                    <?php $hasRec = true ?>
-                    <?php $recPos = $k ?> 
+                <?php if($p->get_recommendation()): ?>
+                    <li><?php echo text($p->get_drug()) ?>
+                    <?php $pieces = explode(";", $p->get_note())?>
+                        <ol type="a">
+                        <?php foreach ($pieces as $k => $r):?> 
+                            <?php if($k != count($pieces)-1):?>
+                                <li><?php echo text($r)?> 
+                            <?php endif;?> 
+                        <?php endforeach; ?>
+                        </ol>
+                    </li>
                     <?php continue; ?>
                 <?php endif;?> 
                 <?php if($p->get_drug() == "Cita"): ?>
@@ -103,14 +111,13 @@
                 <li><?php echo text($p->get_drug())?>
                     <br><?php echo text($p->get_dosage()) . ' ' . text($p->form_array[$p->get_form()]) . ' ' . text($p->route_array[$p->get_route()]) . ' ' . text($p->interval_array[$p->get_interval()])?>
                     <br><span style="padding-left:350px">#<?php echo text($p->get_note())?></span>
-
                 </li>
                 <?php $curPos++ ?>
 
             <?php endforeach; ?>
             <?php if ($hasRec): ?>
                 <li><?php echo text($provider[$recPos]->get_drug()) ?>
-                    <?php $pieces = explode(".", $provider[$recPos]->get_note())?>
+                    <?php $pieces = explode(";", $provider[$recPos]->get_note())?>
                     <ol start="a">
                     <?php foreach ($pieces as $k => $p):?> 
                         <?php if($k != count($pieces)-1):?>

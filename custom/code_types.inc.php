@@ -161,8 +161,12 @@ if (isSnomedSpanish()) {
 //**** End SNOMED Definitions
 
 // ICD 10 Definitions
-define_external_table($code_external_tables, 1, 'icd10_dx_order_code', 'formatted_dx_code', 'long_desc', 'short_desc', array("active='1'","valid_for_coding = '1'"), 'revision DESC');
-define_external_table($code_external_tables, 6, 'icd10_pcs_order_code', 'pcs_code', 'long_desc', 'short_desc', array("active='1'","valid_for_coding = '1'"), 'revision DESC');
+//** Modified ICD10 To Spanish
+//define_external_table($code_external_tables, 1, 'icd10_dx_order_code', 'formatted_dx_code', 'long_desc', 'short_desc', array("active='1'","valid_for_coding = '1'"), 'revision DESC');
+//define_external_table($code_external_tables, 6, 'icd10_pcs_order_code', 'pcs_code', 'long_desc', 'short_desc', array("active='1'","valid_for_coding = '1'"), 'revision DESC');
+//** end mofidifed
+define_external_table($code_external_tables,20,'cie10_diag','code','desc','desc_short',array("active='1'","valid_for_coding = '1'"),'revision DESC');
+define_external_table($code_external_tables,21,'cie10_proced','code','desc','desc_short',array("active='1'","valid_for_coding = '1'"),'revision DESC');
 //**** End ICD 10 Definitions
 
 /**
@@ -181,7 +185,9 @@ $cd_external_options = array(
   '9' => xl('SNOMED (RF1) Procedure'),
   '10' => xl('SNOMED (RF2) Diagnosis'),
   '11' => xl('SNOMED (RF2) Clinical Term'),
-  '12' => xl('SNOMED (RF2) Procedure')
+  '12' => xl('SNOMED (RF2) Procedure'),
+  '20'=> xl('CIE-10 Diagnósticos'),
+  '21'=> xl('CIE-10 Procedimientos'),
 );
 
 /**
